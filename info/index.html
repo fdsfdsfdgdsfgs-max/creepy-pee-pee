@@ -1,49 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Void Archive</title>
-  <style>
-    body {
-      background: black;
-      color: #00ff9f;
-      font-family: monospace;
-      text-align: center;
-      padding-top: 10%;
-    }
-    input, button {
-      background: black;
-      color: #00ff9f;
-      border: 1px solid #00ff9f;
-      padding: 10px;
-      margin: 5px;
-    }
-    .glitch {
-      animation: flicker 0.15s infinite;
-    }
-    @keyframes flicker {
-      0% { opacity: 0.8; }
-      50% { opacity: 1; }
-      100% { opacity: 0.7; }
-    }
-  </style>
+  <title>Redirecting...</title>
 </head>
-<body>
+<body style="background:black; color:#00ff9f; font-family:monospace; text-align:center; padding-top:10%;">
 
-<div id="app"></div>
+<p id="status">Decrypting signal...</p>
 
 <script>
-const path = window.location.pathname;
-
-// --- ENCODE (hex + reverse) ---
-function encodeUrl(url) {
-  let hex = "";
-  for (let i = 0; i < url.length; i++) {
-    hex += url.charCodeAt(i).toString(16);
-  }
-  return hex.split("").reverse().join("");
-}
-
-// --- DECODE ---
+// --- DECODE (reverse + hex) ---
 function decodeUrl(encoded) {
   const reversed = encoded.split("").reverse().join("");
   let str = "";
@@ -55,57 +20,24 @@ function decodeUrl(encoded) {
   return str;
 }
 
-function showGenerator() {
-  document.getElementById("app").innerHTML = `
-    <h1 class="glitch">[ CREATE TRANSMISSION ]</h1>
-    <input id="urlInput" placeholder="https://example.com" size="40">
-    <br>
-    <button onclick="generate()">ENCODE</button>
-    <p id="result"></p>
-  `;
-}
+// --- GET ENCODED PART ---
+const path = window.location.pathname;
+const encoded = path.replace("/info/", "").replace("/index.html", "");
 
-function generate() {
-  const url = document.getElementById("urlInput").value.trim();
+try {
+  const decoded = decodeUrl(encoded);
 
-  if (!url.startsWith("http")) {
-    alert("Enter a valid URL (http/https required)");
-    return;
-  }
+  document.getElementById("status").innerText =
+    "Redirecting to: " + decoded;
 
-  const encoded = encodeUrl(url);
-  const finalLink = window.location.origin + "/info/" + encoded;
+  // --- AUTO REDIRECT ---
+  setTimeout(() => {
+    window.location.replace(decoded);
+  }, 500);
 
-  document.getElementById("result").innerHTML =
-    `<a href="${finalLink}">${finalLink}</a>`;
-}
-
-function showInfo(encoded) {
-  try {
-    const decoded = decodeUrl(encoded);
-
-    document.getElementById("app").innerHTML = `
-      <h1 class="glitch">[ DECRYPTING SIGNAL ]</h1>
-      <p>Destination recovered:</p>
-      <p>${decoded}</p>
-      <br>
-      <button onclick="window.location.href='${decoded}'">
-        PROCEED
-      </button>
-    `;
-  } catch {
-    document.getElementById("app").innerHTML = `
-      <h1>[ SIGNAL CORRUPTED ]</h1>
-    `;
-  }
-}
-
-// --- ROUTING ---
-if (path.startsWith("/info/")) {
-  const encoded = path.replace("/info/", "");
-  showInfo(encoded);
-} else {
-  showGenerator();
+} catch (e) {
+  document.getElementById("status").innerText =
+    "[ SIGNAL CORRUPTED ]";
 }
 </script>
 
