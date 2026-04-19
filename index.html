@@ -32,7 +32,6 @@
 <div id="app"></div>
 
 <script>
-const path = window.location.pathname;
 
 // --- ENCODE (hex + reverse) ---
 function encodeUrl(url) {
@@ -55,6 +54,7 @@ function decodeUrl(encoded) {
   return str;
 }
 
+// --- UI ---
 function showGenerator() {
   document.getElementById("app").innerHTML = `
     <h1 class="glitch">[ CREATE TRANSMISSION ]</h1>
@@ -74,12 +74,15 @@ function generate() {
   }
 
   const encoded = encodeUrl(url);
-  const finalLink = window.location.origin + "/info/" + encoded;
+
+  // ✅ FIXED ROUTE (GitHub Pages safe)
+  const finalLink = window.location.origin + "/info/?c=" + encoded;
 
   document.getElementById("result").innerHTML =
     `<a href="${finalLink}">${finalLink}</a>`;
 }
 
+// --- DISPLAY INFO PAGE (fallback if someone lands here) ---
 function showInfo(encoded) {
   try {
     const decoded = decodeUrl(encoded);
@@ -100,13 +103,16 @@ function showInfo(encoded) {
   }
 }
 
-// --- ROUTING ---
-if (path.startsWith("/info/")) {
-  const encoded = path.replace("/info/", "");
+// --- ROUTING (FIXED) ---
+const params = new URLSearchParams(window.location.search);
+const encoded = params.get("c");
+
+if (encoded) {
   showInfo(encoded);
 } else {
   showGenerator();
 }
+
 </script>
 
 </body>
