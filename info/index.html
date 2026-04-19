@@ -4,11 +4,9 @@
   <title>Redirecting...</title>
 </head>
 <body style="background:black; color:#00ff9f; font-family:monospace; text-align:center; padding-top:10%;">
-
 <p id="status">Decrypting signal...</p>
 
 <script>
-// --- DECODE (reverse + hex) ---
 function decodeUrl(encoded) {
   const reversed = encoded.split("").reverse().join("");
   let str = "";
@@ -20,24 +18,27 @@ function decodeUrl(encoded) {
   return str;
 }
 
-// --- GET ENCODED PART ---
-const path = window.location.pathname;
-const encoded = path.replace("/info/", "").replace("/index.html", "");
+// ✅ GET FROM QUERY STRING
+const params = new URLSearchParams(window.location.search);
+const encoded = params.get("c");
 
-try {
-  const decoded = decodeUrl(encoded);
+if (!encoded) {
+  document.getElementById("status").innerText = "No signal found.";
+} else {
+  try {
+    const decoded = decodeUrl(encoded);
 
-  document.getElementById("status").innerText =
-    "Redirecting to: " + decoded;
+    document.getElementById("status").innerText =
+      "Redirecting to: " + decoded;
 
-  // --- AUTO REDIRECT ---
-  setTimeout(() => {
-    window.location.replace(decoded);
-  }, 500);
+    setTimeout(() => {
+      window.location.replace(decoded);
+    }, 500);
 
-} catch (e) {
-  document.getElementById("status").innerText =
-    "[ SIGNAL CORRUPTED ]";
+  } catch (e) {
+    document.getElementById("status").innerText =
+      "[ SIGNAL CORRUPTED ]";
+  }
 }
 </script>
 
