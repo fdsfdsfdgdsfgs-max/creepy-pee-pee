@@ -29,11 +29,17 @@
 </head>
 <body>
 
-<div id="app"></div>
+<h1 class="glitch">[ CREATE TRANSMISSION ]</h1>
+
+<input id="urlInput" placeholder="https://example.com" size="40">
+<br>
+<button onclick="generate()">ENCODE</button>
+
+<p id="result"></p>
 
 <script>
 
-// --- ENCODE (hex + reverse) ---
+// ENCODE (hex + reverse)
 function encodeUrl(url) {
   let hex = "";
   for (let i = 0; i < url.length; i++) {
@@ -42,75 +48,21 @@ function encodeUrl(url) {
   return hex.split("").reverse().join("");
 }
 
-// --- DECODE ---
-function decodeUrl(encoded) {
-  const reversed = encoded.split("").reverse().join("");
-  let str = "";
-
-  for (let i = 0; i < reversed.length; i += 2) {
-    str += String.fromCharCode(parseInt(reversed.substr(i, 2), 16));
-  }
-
-  return str;
-}
-
-// --- UI ---
-function showGenerator() {
-  document.getElementById("app").innerHTML = `
-    <h1 class="glitch">[ CREATE TRANSMISSION ]</h1>
-    <input id="urlInput" placeholder="https://example.com" size="40">
-    <br>
-    <button onclick="generate()">ENCODE</button>
-    <p id="result"></p>
-  `;
-}
-
 function generate() {
   const url = document.getElementById("urlInput").value.trim();
 
   if (!url.startsWith("http")) {
-    alert("Enter a valid URL (http/https required)");
+    alert("Enter valid http/https URL");
     return;
   }
 
   const encoded = encodeUrl(url);
 
-  // ✅ FIXED ROUTE (GitHub Pages safe)
-  const finalLink = window.location.origin + "/info/?c=" + encoded;
+  // IMPORTANT: always go to /info/
+  const link = window.location.origin + "/info/?c=" + encoded;
 
   document.getElementById("result").innerHTML =
-    `<a href="${finalLink}">${finalLink}</a>`;
-}
-
-// --- DISPLAY INFO PAGE (fallback if someone lands here) ---
-function showInfo(encoded) {
-  try {
-    const decoded = decodeUrl(encoded);
-
-    document.getElementById("app").innerHTML = `
-      <h1 class="glitch">[ DECRYPTING SIGNAL ]</h1>
-      <p>Destination recovered:</p>
-      <p>${decoded}</p>
-      <br>
-      <button onclick="window.location.href='${decoded}'">
-        PROCEED
-      </button>
-    `;
-  } catch {
-    document.getElementById("app").innerHTML = `
-      <h1>[ SIGNAL CORRUPTED ]</h1>
-    `;
-  }
-}
-
-// --- ROUTING (FIXED) ---
-const params = new URLSearchParams(window.location.search);
-const encoded = params.get("c");
-
-if (encoded) {
-  showInfo(encoded);
-} else {
-  showGenerator();
+    `<a href="${link}">${link}</a>`;
 }
 
 </script>
